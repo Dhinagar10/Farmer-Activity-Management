@@ -1,0 +1,528 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarvestHub</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    
+    <script>
+        // Function to fetch high-priority task message using AJAX
+        function showHighPriorityTasks() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'fetch_session.php', true); 
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var taskMessage = xhr.responseText; 
+
+                    if (taskMessage) {
+                        var formattedMessage = taskMessage.replace(/\\n/g, '\n');
+                        alert(formattedMessage);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
+
+</head>
+<body onload="showHighPriorityTasks()">
+    <nav class="navbar">
+        <div class="logo-container">
+            <img src="../assets/harvesthub.jpg" alt="Logo" class="logo" onclick="location.reload();">
+            <span class="app-title">HarvestHub</span>
+        </div>
+        <div class="nav-links">
+            <div class="dropdown">
+                <span>Menu</span>
+                <div class="dropdown-content">
+                    <a href="#">Home</a><br>
+                    <a href="#">Schedule Task</a><br>
+                    <a href="#">Expenditure Tracker</a><br>
+                    <a href="#">Reports</a>
+                </div>
+            </div>
+            <div class="login-signup">
+                <a href="login.html">Login</a>
+                <a href="signup.html">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="summary-card">
+            <h2>Monthly Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <h3><i class="fas fa-tasks"></i> Total Tasks</h3>
+                    <div id="totalTasks" class="stat-value">0</div>
+                </div>
+                <div class="stat-item">
+                    <h3><i class="fas fa-rupee-sign"></i> Total Expenses</h3>
+                    <div id="totalExpenses" class="stat-value">₹0</div>
+                </div>
+                <div class="stat-item">
+                    <h3><i class="fas fa-chart-line"></i> Net Profit/Loss</h3>
+                    <div id="netProfit" class="stat-value">₹0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2><i class="fas fa-calendar-alt"></i> Task Scheduler</h2>
+                <form id="taskForm" class="task-form" method="POST">
+                    <div class="input-group">
+                        <label>Task Name</label>
+                        <input type="text" id="taskName" name="taskName" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" id="taskDate" name="taskDate" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Priority</label>
+                        <select id="taskPriority" name="taskPriority">
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Description</label>
+                        <textarea id="taskDescription" name="taskDescription" rows="3" required></textarea>
+                    </div>
+                    <button type="submit">Add Task</button>
+                </form>
+                
+                
+                <div id="taskList" class="task-list"></div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-coins"></i> Expense Tracker</h2>
+                <form id="expenseForm" class="expense-form">
+                    <div class="input-group">
+                        <label>Category</label>
+                        <select id="expenseCategory" required>
+                            <option value="seeds">Seeds</option>
+                            <option value="fertilizers">Fertilizers</option>
+                            <option value="labor">Labor</option>
+                            <option value="equipment">Equipment</option>
+                            <option value="irrigation">Irrigation</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Amount (₹)</label>
+                        <input type="number" id="expenseAmount" required min="0">
+                    </div>
+                    <div class="input-group">
+                        <label>Notes</label>
+                        <textarea id="expenseNotes" rows="2"></textarea>
+                    </div>
+                    <button type="submit">Add Expense</button>
+                </form>
+                <div class="chart-container">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+
+    
+
+    <div class="weather-container">
+        <div class="container">
+            <div class="weather-card">
+                <h3>Weather <img id="weather-icon" src="../assets/weather.jpeg" alt="Weather Icon"></h3>
+                <input type="text" id="city-input" placeholder="Enter city name">
+                <button id="city-input-btn" onclick="getWeather()">Get Weather</button>
+                <div id="weather-info" class="animate__animated animate__fadeIn">
+                    <h3 id="city-name"></h3>
+                    <p id="date"></p>
+                    <p id="temperature"></p>
+                    <p id="description"></p>
+                    <p id="wind-speed"></p>
+                    <p id="suggestion"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: 20px auto; padding: 10px; border: 1px solid #ddd; background-color: #f5f5f5; width: 80%; max-width: 600px; text-align: center;">
+        <p style="margin: 10px 0; font-size: 16px; color: #333;">
+            Your seasonal Profit according to your crops:
+        </p>
+        <a href="seasonalProfit.html">
+            <button style="padding: 8px 15px; font-size: 14px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Go to Seasonal Profit
+            </button>
+        </a>
+    </div>
+        <div class="card">
+            <div class="card-content">
+                <h2>AGRARIAN REFORM</h2>
+                <ul>
+                    <li>E-Compendium of Articles Published on Agrarian Reform Act 2020</li>
+                    <li>Central Sector Scheme of Financing Facility under Agriculture Infrastructure Fund</li>
+                    <li>Clarification about CHC as an eligible project under Agriculture Infrastructure Fund</li>
+                    <li>SOP for Drones</li>
+                    <li>Standard Operating Procedure for release and utilization</li>
+                </ul>
+                <a href="#" class="view-more">View More »</a>
+            </div>
+        </div>
+<br><br>
+        <div class="card">
+            <div class="card-content">
+                <h2>AGRICULTURE AGREEMENT</h2>
+                <ul>
+                    <li>Model Agriculture Agreement</li>
+                    <li>Model Banana Farming Agreement in Regional Languages</li>
+                    <li>Farmers Welfare</li>
+                    <li>MoU on developing proof of concepts on farmers' database</li>
+                    <li>Model Agriculture Agreement on Banana in Regional Languages</li>
+                </ul>
+                <a href="#" class="view-more">View More »</a>
+            </div>
+        </div>
+        <br><br>
+
+
+    <marquee behavior="scroll" direction="left" style="background-color: #eb2525; color: white; padding: 10px;">
+        Important News: Our new application update is live! Check out the new features!
+    </marquee>
+
+              
+                        
+    
+    
+        
+    
+      
+    
+    
+        
+    
+        <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM fully loaded");
+    
+    const taskForm = document.getElementById('taskForm');
+    if (taskForm) {
+        taskForm.addEventListener('submit', handleTaskSubmission);
+        console.log("Event listener added");
+    } else {
+        console.error("Task form not found");
+    }
+
+    updateTaskList();
+});
+
+function handleTaskSubmission(e) {
+    e.preventDefault();
+    console.log("Inside handleTaskSubmission");
+
+    const task = {
+        id: Date.now(),
+        name: document.getElementById('taskName').value,
+        date: document.getElementById('taskDate').value,
+        priority: document.getElementById('taskPriority').value,
+        description: document.getElementById('taskDescription').value,
+        completed: false
+    };
+
+    // Update local tasks and localStorage
+    tasks.push(task);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    document.getElementById('taskForm').reset();
+    updateTaskList();
+    scheduleNotification(task);
+
+    // Send task to the server via AJAX
+    sendTaskToServer(task);
+}
+
+function sendTaskToServer(task) {
+    const formData = new FormData();
+    formData.append('taskName', task.name);
+    formData.append('taskDate', task.date);
+    formData.append('taskPriority', task.priority);
+    formData.append('taskDescription', task.description);
+
+    fetch('add_task.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again.');
+    });
+}
+
+function updateTaskList() {
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+
+    const sortedTasks = tasks.sort((a, b) => {
+        const priorityOrder = { high: 1, medium: 2, low: 3 };
+        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+        }
+        return new Date(a.date) - new Date(b.date);
+    });
+
+    sortedTasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.className = `task-item ${task.priority} ${task.completed ? 'completed' : ''}`;
+        taskElement.innerHTML = `
+            <div class="task-header">
+                <h4 class="task-title">${task.name}</h4>
+                <div class="task-actions">
+                    <button onclick="toggleTask(${task.id})" class="complete-btn">
+                        ${task.completed ? 'Undo' : 'Complete'}
+                    </button>
+                    <button onclick="deleteTask(${task.id})" class="delete-btn">Delete</button>
+                </div>
+            </div>
+            <p><i class="far fa-calendar"></i> ${new Date(task.date).toLocaleString()}</p>
+            <p><i class="fas fa-flag"></i> ${task.priority} priority</p>
+            <p>${task.description}</p>
+        `;
+        taskList.appendChild(taskElement);
+    });
+}
+
+function toggleTask(id) {
+    tasks = tasks.map(task => 
+        task.id === id ? {...task, completed: !task.completed} : task
+    );
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    updateTaskList();
+}
+
+function deleteTask(id) {
+    tasks = tasks.filter(task => task.id !== id);
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    updateTaskList();
+}
+
+function scheduleNotification(task) {
+    console.log(`Notification scheduled for task: ${task.name}`);
+}
+    
+            
+    
+            let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+let expenseChart;
+
+// Add Expense Function
+function addExpense(e) {
+    e.preventDefault();
+
+    const expense = {
+        id: Date.now(),
+        category: document.getElementById('expenseCategory').value,
+        amount: parseFloat(document.getElementById('expenseAmount').value),
+        notes: document.getElementById('expenseNotes').value,
+    };
+
+    expenses.push(expense);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+
+    document.getElementById('expenseForm').reset();
+
+    updateExpenseChart();
+    updateSummary();
+
+    const formData = new FormData();
+    formData.append('expenseCategory', expense.category);
+    formData.append('expenseAmount', expense.amount);
+    formData.append('expenseNotes', expense.notes);
+
+    // Send data to PHP
+    fetch('expense_form.php', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An unexpected error occurred. Please try again.');
+        });
+
+    showNotification('Expense added successfully!');
+}
+
+function updateExpenseChart() {
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    const categoryTotals = expenses.reduce((acc, expense) => {
+        acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+        return acc;
+    }, {});
+
+    if (expenseChart) {
+        expenseChart.destroy();
+    }
+
+    expenseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(categoryTotals),
+            datasets: [
+                {
+                    label: 'Expenses by Category (₹)',
+                    data: Object.values(categoryTotals),
+                    backgroundColor: [
+                        '#4caf50', '#2196f3', '#ff9800', '#f44336', '#9c27b0', '#795548',
+                    ],
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+        },
+    });
+}
+
+// Update Summary Function
+function updateSummary() {
+    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    document.getElementById('totalExpenses').textContent = `₹${totalExpenses.toFixed(2)}`;
+
+    const estimatedRevenue = totalExpenses * 1.3;
+    const netProfit = estimatedRevenue - totalExpenses;
+    document.getElementById('netProfit').textContent = `₹${netProfit.toFixed(2)}`;
+}
+
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateExpenseChart();
+    updateSummary();
+});
+
+document.getElementById('expenseForm').addEventListener('submit', addExpense);
+        
+            document.getElementById('taskForm').addEventListener('submit', addTask);
+            document.getElementById('expenseForm').addEventListener('submit', addExpense);
+            updateTaskList();
+            updateExpenseChart();
+            updateSummary();
+    
+        
+            tasks.forEach(task => {
+                if (!task.completed) {
+                    scheduleNotification(task);
+                }
+            });
+    
+            // Weather integration
+            
+            async function getWeather() {
+        const city = document.getElementById('city-input').value.trim();
+        const apiKey = 'YOUR_API_KEY';
+        const weatherInfo = document.getElementById('weather-info');
+    
+        if (!city) {
+            alert('Please enter a city name.');
+            return;
+        }
+    
+        try {
+            const response = await fetch(
+                `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=no`
+            );
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.error.message}`);
+                return;
+            }
+    
+            const data = await response.json();
+    
+    
+            document.getElementById('city-name').innerText = `Weather in ${data.location.name}, ${data.location.country}`;
+            document.getElementById('date').innerText = `Date: ${data.location.localtime.split(' ')[0]}`;
+            document.getElementById('temperature').innerText = `Temperature: ${data.current.temp_c}°C`;
+            document.getElementById('description').innerText = `Condition: ${data.current.condition.text}`;
+            document.getElementById('wind-speed').innerText = `Wind Speed: ${data.current.wind_kph} kph`;
+            document.getElementById('weather-icon').src = `https:${data.current.condition.icon}`;
+    
+            let suggestion = '';
+            if (data.current.condition.text.toLowerCase().includes('rain')) {
+                suggestion = 'It is rainy. Ensure proper drainage for your crops.';
+            } else if (data.current.temp_c < 15) {
+                suggestion = 'It is cool. Consider planting winter crops like spinach or lettuce.';
+            } else if (data.current.temp_c >= 25) {
+                suggestion = 'The weather is warm. Ensure your crops are well-watered to prevent dehydration.';
+            } else {
+                suggestion = 'The weather is moderate. Great conditions for most farming activities.';
+            }
+    
+            document.getElementById('suggestion').innerText = `Suggestion: ${suggestion}`;
+            weatherInfo.style.display = 'block';
+        } catch (error) {
+            alert('Unable to fetch weather data. Please try again later.');
+            console.error('Weather API Error:', error);
+        }
+    }
+    
+    </script>
+    
+    
+    
+
+</body>
+</html>

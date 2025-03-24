@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmTracker Login</title>
+  <link rel="stylesheet" href="../assets/login.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">
+          <img src="https://images.unsplash.com/photo-1495107334309-fcf20504a5ab?w=50&h=50&fit=crop&auto=format" alt="Farm logo" class="logo-img">
+          <h1>FarmTracker</h1>
+        </div>
+        <p class="welcome-text">Welcome back! Please login to your account.</p>
+      </div>
+
+      <form class="login-form" action="login.php" method="POST">
+        <div class="form-group">
+            <label for="mobile">Mobile number</label>
+            <input type="tel" id="mobile" name="mobile" placeholder="Enter your mobile number" required pattern="[0-9]{10}">
+        </div>
+    
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+    
+        <div class="form-options">
+            <label class="remember-me">
+                <input type="checkbox" id="remember">
+                <span class="checkbox-label">Remember me</span>
+            </label>
+            <a href="#" class="forgot-password">Forgot password?</a>
+        </div>
+    
+        <button type="submit" class="login-button">Sign in</button>
+    
+        <div class="register-link">
+            Don't have an account? <a href="signup.html">Register now</a>
+        </div>
+    </form>
+    
+    
+    </div>
+
+    <div class="login-image">
+      <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=1600&fit=crop&auto=format" alt="Farm landscape">
+    </div>
+  </div>
+</body>
+</html>
